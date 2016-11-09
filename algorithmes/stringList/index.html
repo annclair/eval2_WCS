@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <!--
 Soit un tableau de noms : names
 
@@ -10,21 +11,76 @@ Le fond rouge si elle apparait 3 fois ou plus
 -->
 <html ng-app="app">
 
+<style>
+    .2names {
+        background-color: orange;
+        color: white;
+    }
+
+    .sup3{
+        background-color: red;
+        color: white;
+    }
+</style>
+
+
 <body>
+
+    <h1> {{'Coucou'.toUpperCase()}} </h1>
+
+    <table-noms><table-noms>
 
 </body>
 
+<script src="js/libs/angular.min.js"></script>
+
+
 <script>
-    const names = ['Jean', 'Pierre', 'Louis', 'Jean', 'William', 'Jean', 'Mila',
-        'Mila', 'Nori', 'Brianna', 'Yu', 'Tomoko', 'Tomoko', 'Tomoko', 'Tomoko',
-        'Della', 'Terica', 'Debby', 'Rosy', 'Suzi', 'Ron', 'Ron', 'Viviana', 'Wes',
-        'Matt', 'Karla', 'Alia', 'Ramon', 'Ramon', 'Sandra', 'Luigi', 'Luigi', 'Luigi',
-        'Luigi', 'Luigi', 'Luigi', 'Luigi', 'Vesta', 'Ladawn', 'Geralyn'
-    ];
 
     var app = angular.module('app', []);
 
     //YOUR CODE HERE
+    app.component('tableNoms', {
+        template: ` <table>
+                        <tr>
+                            <th>Nom</th>
+                        </tr>
+                        <tr ng-repeat="name in $ctrl.list track by $index" ng-class="{'2names':this.list.nb = 2, 'sup3':this.list.nb >= 3}">
+                            <td>{{name}}</td>
+                        </tr>
+                    </table>`,
+
+        controller: function() {
+
+          const names = ['Jean', 'Pierre', 'Louis', 'Jean', 'William', 'Jean', 'Mila',
+              'Mila', 'Nori', 'Brianna', 'Yu', 'Tomoko', 'Tomoko', 'Tomoko', 'Tomoko',
+              'Della', 'Terica', 'Debby', 'Rosy', 'Suzi', 'Ron', 'Ron', 'Viviana', 'Wes',
+              'Matt', 'Karla', 'Alia', 'Ramon', 'Ramon', 'Sandra', 'Luigi', 'Luigi', 'Luigi',
+              'Luigi', 'Luigi', 'Luigi', 'Luigi', 'Vesta', 'Ladawn', 'Geralyn'
+          ];
+
+          let triNames = names.sort()
+          this.list = [];
+          let name = ''
+          let nb = 0;
+
+          //console.log(triNames)
+
+          for (i=0; i<triNames.length; i++){
+              name = triNames[i];
+              if (triNames[i] != triNames[i-1]){
+                  nb =1
+              }else{
+              //while (triNames[i] == triNames[i-1])
+                nb +=1
+              }
+              this.list.push( { "name" : name , "nb" : nb } )
+          }
+
+            //console.log(this.list)
+            this.names = this.list.name
+        }
+    })
 </script>
 
 </html>
