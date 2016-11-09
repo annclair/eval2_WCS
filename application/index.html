@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Blog</title>
+
+    <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+
+<body>
+
+    <div class="blocPage">
+        <h1> Blog</h1>
+        <div>
+            <div ng-controller="postsController as $ctrl" class="blogEntier">
+                <div ng-repeat="post in $ctrl.posts" ng-if="$index < 3" class="unpost">
+                    <h2> {{post.title}} </h2>
+                    <p> {{post.content}} </p>
+                    <button type="button" name="button" class="btnLearnMore">Learn more -></button>
+                </div>
+            <div class='titi'>
+              <h2>au secours !!!!!</h2>
+            </div>
+                <h1> {{ $ctrl.selected }} </h1>
+            </div>
+        </div>
+
+        <button type="button" name="button" ng-click="$ctrl.add()" class="btnAddPost"> + Add article</button>
+    </div>
+
+</body>
+
+<script src="libs/angular.min.js"></script>
+<!-- <script type="text/javascript" src="libs/jquery.min.js"></script>
+<script type="text/javascript" src="libs/bootstrap.js"></script> -->
+
+
+<script>
+    var app = angular.module('app', []);
+
+    app.controller('postsController', function($http) {
+
+        let _previous = {}
+
+        // on récupere les posts
+
+        $http.get('/posts.json').then((res) => {
+            this.posts = res.data
+        })
+
+        // on ajoute des posts
+
+        this.add = () => {
+            $http.post('/posts', this.selectedUser).then((res) => {
+                // debugger
+                this.selectedUser = {}
+                this.posts.push(res.data)
+            })
+        }
+
+        // on supprime les posts
+
+        this.delete = (post, index) => {
+            $http.delete('/posts/' + post._id).then((res) => {
+                //debugger
+                this.posts.splice(index, 1)
+            })
+        }
+
+        // on modifie les posts
+
+        this.edit = (post) => {
+            if (post.editMode) {
+                // http
+                $http.put('/posts/' + post._id, post).then((res) => {
+                    post.editMode = false
+                })
+            } else {
+                _previous[post._id] = angular.copy(post) // on fait une copie du post dans un objet previous et avec comme valeur tout l'bjet
+                post.editMode = true
+            }
+        }
+
+        // on annule une modification en cours
+
+        this.cancel = (post, index) => {
+            this.posts[index] = _previous[post._id]
+        }
+    })
+</script>
+
+</html>
