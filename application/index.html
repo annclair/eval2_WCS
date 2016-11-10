@@ -17,7 +17,7 @@
         <h1> Blog</h1>
         <div>
             <div ng-controller="postsController as $ctrl" class="blogEntier">
-                <div ng-repeat="post in $ctrl.posts | limitTo: 3" class="unpost" ng-if="!$ctrl.selectedPost">
+                <div ng-repeat="post in $ctrl.posts | limitTo: 3" class="unpost" ng-if="!$ctrl.selectedPost && !$ctrl.this.newPost">
                     <h2 class="blogH2"> {{post.title}} </h2>
                     <p class="blogP"> {{post.content}} </p>
                     <button type="button" name="button" class="btn btnLearnMore" ng-click="$ctrl.selectedPost = post">Learn more -></button>
@@ -25,18 +25,27 @@
 
 
                 <div class="zoomArticle" ng-if="$ctrl.selectedPost">
+                    <button type="button" class="btn btn-close" name="button" ng-click="$ctrl.selectedPost = null"> X </button>
                     <h2 class="articleH2" ng-if="!selectedPost.editMode"> {{$ctrl.selectedPost.title}} </h2>
                         <input ng-if="selectedPost.editMode" type="text" name="title" ng-model="selectedPost.title">
                     <h3 class="articleH3"> le {{$ctrl.selectedPost.PublishedAt*1000 | date:"dd/MM/yyyy"}} </h3>
-                    <p class="articleP"> {{$ctrl.selectedPost.content}} </p>
-                    <button type="button" class="btn " name="button" ng-click="$ctrl.edit(selectedPost)">{{ (selectedPost.editMode ? 'Valider' : 'Modifier')}} </button>
-                    <button type="button" class="btn " name="button" ng-if="post.editMode" ng-click="$ctrl.cancel(post, $index)"> Annuler </button>
-                    <button type="button" class="btn " name="button" ng-click="$ctrl.delete(post, $index)"> Supprimer </button>
+                    <p class="articleP" ng-if="!selectedPost.editMode"> {{$ctrl.selectedPost.content}} </p>
+                        <input ng-if="selectedPost.editMode" type="text" name="title" ng-model="selectedPost.content">
+                    <button type="button" class="btn " name="button" ng-click="selectedPost.editMode = true"> {{(selectedPost.editMode ? 'Valider' : 'Modifier')}} </button>
+                    <button type="button" class="btn " name="button" ng-click="$ctrl.delete(selectedPost, $index)"> Supprimer </button>
+                </div>
+
+                <div class="newArticle" ng-if="$ctrl.newPost">
+                    <!-- <button type="button" class="btn btn-close" name="button" ng-click="$ctrl.newPost = null"> X </button> -->
+                    <input type="text" name="title" ng-model="newPost.title">
+                      <input type="text" name="title" ng-model="newPost.PublishedAt">
+                    <input type="text" name="title" ng-model="newPost.content">
+                    <button type="button" class="btn " name="button" ng-click=""> Valider </button>
                 </div>
 
             </div>
         </div>
-        <button type="button" name="button" ng-click="$ctrl.add()" class="btn btnAddPost" ng-if="!$ctrl.selectedPost"> + Add article</button>
+        <button type="button" name="button" ng-click="$ctrl.newPost" class="btn btnAddPost"> + Add article </button>
     </div>
 
 </body>
@@ -58,44 +67,44 @@
 
         // on modifie les posts
 
-        this.edit = (selectedPost) => {
-            if (selectedPost.editMode) {
-                // http
-                $http.put('//posts.json/' + selectedPost.title,  selectedPost).then((res) => {
-                    selectedPost.editMode = false
-                })
-            }
-            // else {
-            //     _previous[ selectedPost._id] = angular.copy(post) // on fait une copie du post dans un objet previous et avec comme valeur tout l'bjet
-            //     post.editMode = true
-            // }
-        }
+        // this.edit = (selectedPost) => {
+        //
+        //
+        //      if (selectedPost.editMode) {
+        //          // http
+        //          this.put('/posts.json/' + post.index,  selectedPost).then((res) => {
+        //              selectedPost.editMode = false
+        //          })
+        //      }
+        //      else {
+        //     //     _previous[ selectedPost._id] = angular.copy(post) // on fait une copie du post dans un objet previous et avec comme valeur tout l'bjet
+        //          post.editMode = true
+        //     }
+        // }
 
         // on annule une modification en cours
 
-        this.cancel = (post, index) => {
-            this.posts[index] = _previous[post._id]
-        }
+        // this.cancel = (post, index) => {
+        //     this.posts[index] = _previous[post._id]
+        // }
 
 
-        // on ajoute des posts
+        //on ajoute des posts
 
         this.add = () => {
-            $http.post('/posts.json', this.selectedPost).then((res) => {
+            //this.post('/posts', this.newPost).then((res) => {
                 // debugger
-                this.selectedPost = {}
-                this.posts.push(res.data)
-            })
+                this.newPost = {}
+                this.posts.push(this.newPost)
+            //})
         }
 
         // on supprime les posts
 
-        this.delete = (post, index) => {
-            $http.delete('//posts.json/' + post._id).then((res) => {
-                //debugger
-                this.posts.splice(index, 1)
-            })
-        }
+        this.delete = (selectedPost, index) => {
+            this.posts.splice(index, 1);
+            selectedPost = null
+      }
 
 
     })
