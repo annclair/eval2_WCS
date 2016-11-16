@@ -30,8 +30,8 @@ p{
 
   width : 280px;
   height : 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /*overflow: hidden;
+  text-overflow: ellipsis;*/
 }
 
 .articleP{
@@ -59,7 +59,7 @@ p{
 }
 
 .zoomArticle{
-  margin : 10px;
+  margin : 70px;
   padding : 30px;
   background-color: white; }
 
@@ -82,4 +82,10 @@ p{
   font-weight: bold;
   font-size: 1.6em;
   margin : 5% 0 5% 45%;
+}
+
+.nextprev{
+  width : 40px;
+  font-weight: bold;
+  font-size: 1em;
 }

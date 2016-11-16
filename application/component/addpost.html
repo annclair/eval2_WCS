@@ -1,0 +1,7 @@
+<div class="newArticle" ng-if="$ctrl.newPost">
+    <!-- <button type="button" class="btn btn-close" name="button" ng-click="$ctrl.newPost = null"> X </button> -->
+    <input type="text" name="title" ng-model="post.title">
+      <input type="text" name="PublishedAt" ng-model="post.PublishedAt">
+    <input type="text" name="content" ng-model="post.content">
+    <button type="button" class="btn " name="button" ng-click="$ctrl.add()"> Valider </button>
+</div>
