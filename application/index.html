@@ -18,12 +18,12 @@
         <div  ng-controller="postsController as $ctrl">
             <div class="blogEntier">
 
-                <button type="button" class="btn nextprev" name="button" ng-click="$ctrl.back()" ng-if="$ctrl.page >= 0"> <- </button>
+                <button type="button" class="btn nextprev" name="button" ng-click="$ctrl.back()" ng-if="$ctrl.startIndex > 0 && !$ctrl.selectedPost"> <- </button>
 
-                <div ng-repeat="post in $ctrl.posts | limitTo:3" class="unpost" ng-if="!$ctrl.selectedPost && !$ctrl.newPost">
+                <div ng-repeat="post in $ctrl.posts | limitTo:3 : $ctrl.startIndex" class="unpost" ng-if="!$ctrl.selectedPost && !$ctrl.newPost">
                     <h2 class="blogH2"> {{post.title}} </h2>
                     <p class="blogP"> {{post.content | limitTo:300}} </p>
-                    <button type="button" name="button" class="btn btnLearnMore" ng-click="$ctrl.selectedPost = post">Learn more -></button>
+                    <button type="button" name="button" class="btn btnLearnMore" ng-click="$ctrl.indexPost(post, $index)">Learn more -></button>
                 </div>
 
                 <div class="zoomArticle" ng-if="$ctrl.selectedPost">
@@ -33,10 +33,10 @@
                     <h3 class="articleH3"> le {{$ctrl.selectedPost.PublishedAt*1000 | date:"dd/MM/yyyy"}} </h3>
                     <p class="articleP" ng-if="!$ctrl.selectedPost.editMode"> {{$ctrl.selectedPost.content| limitTo:300}} </p>
                     <textarea rows="8" cols="50" ng-if="$ctrl.selectedPost.editMode" type="text" name="title" ng-model="$ctrl.selectedPost.content"></textarea>
-                    <button type="button" class="btn " name="button" ng-if="!$ctrl.selectedPost.editMode"ng-click="$ctrl.selectedPost.editMode = true"> Modifier </button>
-                    <button type="button" class="btn " name="button" ng-if="$ctrl.selectedPost.editMode"ng-click="$ctrl.selectedPost.editMode = false">Valider</button>
-                    <button type="button" class="btn " name="button" ng-if="!$ctrl.selectedPost.editMode"ng-click="$ctrl.delete(selectedPost, $index); $ctrl.selectedPost = null"> Supprimer </button>
-                    <button type="button" class="btn " name="button" ng-if="$ctrl.selectedPost.editMode" ng-click="$ctrl.cancel(selectedPost, $index)">Annuler</button>
+                    <button type="button" class="btn " name="button" ng-if="!$ctrl.selectedPost.editMode" ng-click="$ctrl.edit() ; $ctrl.selectedPost.editMode = true"> Modifier </button>
+                    <button type="button" class="btn " name="button" ng-if="$ctrl.selectedPost.editMode" ng-click="$ctrl.selectedPost.editMode = false">Valider</button>
+                    <button type="button" class="btn " name="button" ng-if="!$ctrl.selectedPost.editMode" ng-click="$ctrl.delete(selectedPost, $index); $ctrl.selectedPost = null"> Supprimer </button>
+                    <button type="button" class="btn " name="button" ng-if="$ctrl.selectedPost.editMode" ng-click="$ctrl.cancel()">Annuler</button>
                 </div>
 
                 <div class="newArticle" ng-if="$ctrl.newPost">
@@ -47,7 +47,7 @@
                     <button type="button" class="btn " name="button" ng-click="$ctrl.add(); $ctrl.newPost = null"> Valider </button>
                 </div>
 
-                <button type="button" class="btn nextprev" name="button" ng-click="$ctrl.next()" ng-if="$ctrl.page <= $ctrl.posts.length-3"> -> </button>
+                <button type="button" class="btn nextprev" name="button" ng-click="$ctrl.next()" ng-if="$ctrl.startIndex < $ctrl.posts.length-3 && !$ctrl.selectedPost"> -> </button>
 
             </div>
             <button type="button" name="button" ng-click="($ctrl.newPost = {})" class="btn btnAddPost"ng-if="!$ctrl.selectedPost"> + Add article </button>
@@ -70,7 +70,8 @@
 
     app.controller('postsController', function($http) {
 
-        let _previous = {}
+        let _previous = {};
+        this.startIndex = 0
 
         // on récupere les posts
 
@@ -78,59 +79,46 @@
             this.posts = res.data
         })
 
+        this.indexPost=(post, index) => {
+          this.selectedPost = post
+          this.selectedPost.position = index
+        }
+
         //on ajoute des posts
 
         this.add = () => {
-            //this.post('/posts', this.newPost).then((res) => {
             this.posts.push(this.newPost)
             this.newPost = {}
-                //})
         }
 
         // on supprime les posts
 
         this.delete = (selectedPost, index) => {
-            this.posts.splice(index, 1);
-            //selectedPost = null
+            this.posts.splice(this.selectedPost.position, 1);
+            this.post = null
         }
 
         // on modifie les posts
 
-        this.edit = (selectedPost) => {
-
-
-            //(selectedPost.editMode = selectedPost.editMode ? false : true);
-
-
-                 if (selectedPost.editMode) {
-                     // http
-                    //  this.put('/posts.json/' + post.index,  selectedPost).then((res) => {
-                         selectedPost.editMode = false
-                     //})
-                 }
-                 else {
-                     _previous[post.index] = angular.copy(post) // on fait une copie du post dans un objet previous et avec comme valeur tout l'bjet
-                     selectedPost.editMode = true
-                }
+        this.edit = () => {
+            _previous[this.selectedPost.position] = angular.copy(this.selectedPost)
         }
 
         //on annule une modification en cours
 
-        this.cancel = (selectedPost, index) => {
-            this.posts[index] = _previous[selectedPost.index]
+        this.cancel = () => {
+            this.posts[this.selectedPost.position] = _previous[this.selectedPost.position]
+            this.selectedPost = null
         }
 
         // gestion des fleches précedent & suivant
 
-        var $ctrl = this;
-        $ctrl.page = 1;
-
-        $ctrl.next = function(){
-            $ctrl.page += 1;
+        this.next = function(){
+            this.startIndex += 1;
         };
 
-        $ctrl.back = function(){
-            $ctrl.page -= 1;
+        this.back = function(){
+            this.startIndex -= 1;
         };
 
 
